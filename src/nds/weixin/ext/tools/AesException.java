@@ -1,5 +1,6 @@
 package nds.weixin.ext.tools;
 
+
 @SuppressWarnings("serial")
 public class AesException extends Exception {
 
