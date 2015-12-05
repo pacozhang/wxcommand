@@ -18,5 +18,6 @@ public class UnAuthorizedDispose implements IAuthorizedEventDispose{
 		WeUtils wu=wum.getByAppid(pappid);
 		
 		if(wu!=null) {wu.unAuthorized();}
+		
 	}
 }
