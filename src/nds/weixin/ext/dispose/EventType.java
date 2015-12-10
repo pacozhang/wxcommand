@@ -17,7 +17,8 @@ public enum EventType {
 	scan("scan","nds.weixin.ext.dispose.ScanDispose"),
 	//locationEvent("locatione",""),
 	click("click","nds.weixin.ext.dispose.ClickDispose"),
-	view("view","nds.weixin.ext.dispose.ViewDispose");
+	view("view","nds.weixin.ext.dispose.ViewDispose"),
+	masssendjobfinish("masssendjobfinish","nds.weixin.ext.dispose.MasssendjobfinishDispose");
 	
 	private String eType;
     private String eDispose;
@@ -53,6 +54,7 @@ public enum EventType {
         	eTypes.put("scan", scan);
         	eTypes.put("click", click);
         	eTypes.put("view", view);
+        	eTypes.put("masssendjobfinish", masssendjobfinish);
         }
         
         return eTypes.get(eType);
