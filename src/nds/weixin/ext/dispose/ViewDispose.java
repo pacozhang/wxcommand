@@ -15,6 +15,7 @@ public class ViewDispose implements IMessageDispose {
 	@Override
 	public void dispose(HttpServletRequest request,HttpServletResponse response, WxPublicControl wpc, JSONObject jo) {
 		logger.debug("viewDispose->");
+		logger.debug("test git-hub");
 	}
 
 }
