@@ -177,6 +177,17 @@ public class OpencardCommand extends Command{
 				String res=(String)list.iterator().next();
 				logger.debug("online opencard adjustintegral result->"+res);
 				
+				//修改领卡成功
+				String sql="update wx_vip v set v.opencard_status=2,v.opendate=to_number(to_char(sysdate,'yyyyMMdd')),v.birthday=?,v.relname=?,v.sex=?,v.phonenum=? where v.id=?";
+				try {
+					QueryEngine.getInstance().executeUpdate(sql, new Object[] {jo.optString("BIRTHDAY"),jo.optString("RELNAME"),jo.optString("SEX"),phone,vipid});
+				} catch (Exception e) {
+					logger.error("opencard update vip error:"+e.getLocalizedMessage());
+					e.printStackTrace();
+					vh.put("code", "-1");
+					vh.put("message", "领卡失败，请重试");
+					return vh;
+				}
 				vh.put("code", "0");
 				vh.put("message", "领卡成功");
 			}catch(Exception e) {
@@ -233,8 +244,7 @@ public class OpencardCommand extends Command{
 		al=(List)al.get(0);
 		int integral=0;
 		String coupontypecode=String.valueOf(al.get(4));
-		String openstatus=String.valueOf(al.get(15));
-		
+		String openstatus=String.valueOf(al.get(16));
 		//判断是否重复领卡
 		if("2".equals(openstatus)){
 			logger.error("opencard find vip error:having opencard vipid:"+vipid);
@@ -253,7 +263,7 @@ public class OpencardCommand extends Command{
 			offvipinfo.put("credit",integral);
 			offvipinfo.put("storecode",String.valueOf(al.get(11)));
 			offvipinfo.put("name",jo.optString("RELNAME"));
-			offvipinfo.put("gender",jo.optString("GENDER"));
+			offvipinfo.put("gender",jo.optString("SEX"));
 			offvipinfo.put("birthday",jo.optString("BIRTHDAY"));
 			offvipinfo.put("contactaddress",jo.optString("CONTACTADDRESS"));				
 			offvipinfo.put("phonenum",phone);
@@ -400,7 +410,7 @@ public class OpencardCommand extends Command{
 		//修改会员资料
 		JSONObject offvipjo=resjo.optJSONObject("card");
 		
-		String sql="update wx_vip v set (v.docno,v.vipcardno,v.viptype,v.store,v.isbd,v.opencard_status,opendate,v.integral,v.birthday,v.relname,v.sex,v.phonenum,v.contactaddress,v.province,v.city,v.area)="
+		String sql="update wx_vip v set (v.docno,v.vipcardno,v.viptype,v.store,v.isbd,v.opencard_status,v.opendate,v.integral,v.birthday,v.relname,v.sex,v.phonenum,v.contactaddress,v.province,v.city,v.area)="
 				+" (select ?,?,nvl(vbs.id,ov.viptype),nvl(s.id,ov.store),?,2,to_number(to_char(sysdate,'yyyyMMdd')),?,?,?,?,?,?,?,?,? from wx_vip ov left join wx_vipbaseset vbs on vbs.code=? and vbs.ad_client_id=? and vbs.code is not null left join wx_store s on s.code=? and s.ad_client_id=? and s.code is not null  where ov.id=?)"
 				+" where v.id=?";
 		

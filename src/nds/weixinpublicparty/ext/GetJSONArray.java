@@ -118,6 +118,7 @@ public class GetJSONArray extends Command{
 		int startindex=currentpage*pagesize;
 		if (startindex<0){startindex=0;}
 		query.setRange(startindex, pagesize);
+		logger.debug("currentpage:"+currentpage+",pagesize:"+pagesize+",startindex:"+startindex+",parm:"+parm+",pos:"+pos+",adClientId:"+adClientId);
 
 	    
 	    Expression expr=null;
@@ -173,7 +174,7 @@ public class GetJSONArray extends Command{
 	        pkValue= Tools.getInt(result.getObject(1),-1);
 	        url=StringUtils.replace(mainTablePath, "@ID@", String.valueOf(pkValue));  //mainTablePath+"?id="+pkValue;
 	        if(parm!=null&&pos>0){
-	        url=StringUtils.replace(mainTablePath, parm, String.valueOf(result.getObject(pos)));  //mainTablePath+"?id="+pkValue;
+	        	url=StringUtils.replace(mainTablePath, parm, String.valueOf(result.getObject(pos)));  //mainTablePath+"?id="+pkValue;
 	        }
 	        
 	        currentjo=new JSONObject();

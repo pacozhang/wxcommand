@@ -8,7 +8,7 @@ import nds.log.Logger;
 import nds.log.LoggerManager;
 import nds.publicplatform.api.GetUserAuthorization;
 import nds.query.QueryEngine;
-import nds.weixin.ext.IAuthorization;
+import nds.web.IAuthorization;
 import nds.weixin.ext.WeUtils;
 import nds.weixin.ext.tools.WeCreateOrSearchVip;
 
