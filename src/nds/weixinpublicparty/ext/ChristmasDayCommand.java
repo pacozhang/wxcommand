@@ -27,7 +27,7 @@ public class ChristmasDayCommand extends Command {
 	public ValueHolder execute(DefaultWebEvent event) throws NDSException,
 			RemoteException {
 		// TODO Auto-generated method stub
-ValueHolder vh=new ValueHolder();
+		ValueHolder vh=new ValueHolder();
 		
 		Hashtable<Integer,List> compaoninf=new Hashtable<Integer,List>();
 		//查出圣诞节的节日券
