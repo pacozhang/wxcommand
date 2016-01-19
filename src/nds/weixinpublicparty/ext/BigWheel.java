@@ -69,16 +69,19 @@ public class BigWheel {
 						new Object[] { adClientId, wxBigWheelId, wxVipId })
 				.toString());
 
+	/*
+	 * 	戈美琪中奖可继续抽奖 2016-1-4
 		// 查询vip是否中奖
 		String recordCountStr = "select count(*) from WX_BIGWHEELRECORD t where t.ad_client_id = ? and t.wx_bigwheel_id = ? and t.wx_vip_id = ? and t.wx_bigwheelaward_id is not null";
-		int recordCount = Integer.parseInt(QueryEngine
+
+  		int recordCount = Integer.parseInt(QueryEngine
 				.getInstance()
 				.doQueryOne(recordCountStr.toString(),
 						new Object[] { adClientId, wxBigWheelId, wxVipId })
 				.toString());
 		if(recordCount >= 1){
 			return "{\"code\":\"-1\",\"message\":\"您本次活动已经抽中奖品，则不可再转！\"}";
-		}
+		}*/
 
 		int remainCount = maxtimes - useCount;
 		if (remainCount <= 0) {

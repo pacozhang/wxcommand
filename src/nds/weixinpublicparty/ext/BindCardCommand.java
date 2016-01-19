@@ -187,7 +187,7 @@ public class BindCardCommand extends Command{
 			offvipinfo.put("email",String.valueOf(al.get(4)));
 			offvipinfo.put("idno",String.valueOf(al.get(5)));
 			offvipinfo.put("cardno",jo.optString("DOCNO"));
-			offvipinfo.put("cardpwd",jo.optString("VIPPASSWORD"));
+			offvipinfo.put("cardpwd",jo.optString("VIPPASSWORD",""));
 			offvipinfo.put("viptype",String.valueOf(al.get(2)));
 			offvipinfo.put("cardpin","");
 			storeid=Tools.getInt(al.get(3),0);
@@ -252,7 +252,7 @@ public class BindCardCommand extends Command{
 		params.put("ts",ts);
 		params.put("sig",sign);
 		params.put("method","bindCard");
-		
+		logger.debug("bindcard offparam ------------------>"+offparam.toString());
 		//调用线下开卡
 		try{
 			vh=RestUtils.sendRequest(serverUrl,params,"POST");
@@ -360,11 +360,14 @@ public class BindCardCommand extends Command{
 		String sql="update wx_vip v"
 				   +" set (v.integral,v.lastamt,v.viptype,v.docno,v.relname,v.email,v.phonenum,v.store,v.contactaddress,v.birthday,v.sex,v.province,v.city,v.area,v.isbd,v.bindtime)"
 				   +" ="
-				   +" (select ?,?,nvl(vbs.id,v.viptype),?,?,?,?,nvl(s.id,v.store),?,?,?,?,?,?,'Y',sysdate from wx_vip v left join wx_vipbaseset vbs on v.id=? and vbs.code=? and vbs.ad_client_id=? left join wx_store s on s.code=? and s.ad_client_id=? where v.id=?)"
+				   +" (select ?,?,nvl(vbs.id,v.viptype),?,nvl(?,v.relname),?,nvl(?,v.phonenum),nvl(s.id,v.store),?,nvl(?,v.birthday),?,?,?,?,'Y',sysdate from wx_vip v left join wx_vipbaseset vbs on v.id=? and vbs.code=? and vbs.ad_client_id=? left join wx_store s on s.code=? and s.ad_client_id=? where v.id=? and rownum=1)"
 				   +" where v.id=?";
 		
 		try{
-			QueryEngine.getInstance().executeUpdate(sql,new Object[] {cardjo.optInt("credit"),cardjo.optDouble("balance"),cardjo.optString("no"),cardjo.optString("name"),cardjo.optString("email"),cardjo.optString("phonenum"),cardjo.optString("address"),cardjo.optString("birthday"),cardjo.optString("gender"),cardjo.optString("province"),cardjo.optString("city"),cardjo.optString("depart"),vipid,cardjo.optString("level"),companyid,cardjo.optString("shopcode"),companyid,vipid,vipid});
+			String birthday = cardjo.optString("birthday","");
+			birthday = nds.util.Validator.isNotNull(birthday)?birthday:"";
+			logger.debug("bindcard updatevip params : birthday-->"+birthday+"  name-->"+cardjo.optString("name","")+" phoneno-->"+cardjo.optString("phonenum",""));
+			QueryEngine.getInstance().executeUpdate(sql,new Object[] {cardjo.optInt("credit"),cardjo.optDouble("balance"),cardjo.optString("no"),cardjo.optString("name",""),cardjo.optString("email"),cardjo.optString("phonenum",""),cardjo.optString("address"),birthday,cardjo.optString("gender"),cardjo.optString("province"),cardjo.optString("city"),cardjo.optString("depart"),vipid,cardjo.optString("level"),companyid,cardjo.optString("shopcode"),companyid,vipid,vipid});
 		}catch(Exception e){
 			logger.debug("online bindcard brecommend send coupon erroe->"+e.getMessage());
 			e.printStackTrace();

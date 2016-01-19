@@ -6,11 +6,14 @@ import java.util.Date;
 import java.util.List;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import nds.control.ejb.Command;
 import nds.control.event.DefaultWebEvent;
 import nds.control.util.ValueHolder;
+import nds.control.web.ClientControllerWebImpl;
+import nds.control.web.WebUtils;
 import nds.publicplatform.api.WeUser;
 import nds.query.QueryEngine;
 import nds.util.NDSException;
@@ -34,9 +37,10 @@ public class WeUpdateVipCommand extends Command {
 			return vh;
 		}
 		List vip=null;
+		String rqimg=null;
 		String updatetime=null;
 		String currentdate=null;
-		String searchvip="select vi.id,vi.ad_client_id,vi.wechatno,vi.updatedate from wx_vip_inqury vi where vi.wx_vip_id=?";
+		String searchvip="select vi.id,vi.ad_client_id,vi.wechatno,vi.updatedate,v.rqcode from wx_vip_inqury vi left join wx_vip v on vi.wx_vip_id=v.id where vi.wx_vip_id=?";
 		String updatetvip="update wx_vip_inqury vi set vi.PHOTO=?,vi.NICKNAME=?,vi.UNIONID=?,vi.COUNTRY=?,vi.PROVINCE=?,vi.CITY=?,vi.sex=?,vi.CONTACTADDRESS=?,vi.ISSUBSCRIBE=?,vi.updatedate=to_char(sysdate,'yyyyMMdd')"+
 			  " where vi.id=?";
 		try {
@@ -53,10 +57,29 @@ public class WeUpdateVipCommand extends Command {
 		compaynid=Tools.getInt(((List)vip.get(0)).get(1), -1);
 		updatetime=String.valueOf(((List)vip.get(0)).get(3));
 		openid=String.valueOf(((List)vip.get(0)).get(2));
+		rqimg=String.valueOf(((List)vip.get(0)).get(4));
 		if(nds.util.Validator.isNull(openid)||tvipid<=0 || compaynid<=0) {
 			vh.put("code","-1");
 			vh.put("message", "会员ID："+vipid+",信息不正确");
 			return vh;
+		}
+		
+		//生成VIP二维码
+		if(nds.util.Validator.isNull(rqimg)){
+			ClientControllerWebImpl controller=(ClientControllerWebImpl)WebUtils.getServletContextManager().getActor(nds.util.WebKeys.WEB_CONTROLLER);
+			JSONObject param=new JSONObject();
+			JSONObject jsparam=new JSONObject();
+			try {
+				param.put("vipid", vipid);
+				jsparam.put("params", param);
+				
+				DefaultWebEvent qrcodeevent=new DefaultWebEvent("CommandEvent");
+				qrcodeevent.put("jsonObject", jsparam);
+				qrcodeevent.setParameter("command", "nds.weixinpublicparty.ext.SendTwoDimensionalCodeCommand");
+				controller.handleEventBackground(qrcodeevent);
+			} catch (JSONException e2) {
+				e2.printStackTrace();
+			}
 		}
 		
 		Date d = new Date(); 

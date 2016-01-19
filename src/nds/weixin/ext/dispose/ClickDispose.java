@@ -18,7 +18,11 @@ import nds.publicweixin.ext.common.WxPublicControl;
 import nds.query.QueryEngine;
 import nds.query.QueryException;
 import nds.query.QueryRequestImpl;
+import nds.weixin.ext.WePublicparty;
+import nds.weixin.ext.WePublicpartyManger;
 import nds.weixin.ext.WeUtils;
+import nds.weixin.ext.tools.SendWXMessage;
+import nds.weixin.ext.tools.WXBizMsgCrypt;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -90,25 +94,56 @@ public class ClickDispose implements IMessageDispose {
 				return;
 			}
 			if(vh!=null) {
-				try {
-					messagejo.put("MsgType", "text");
-					messagejo.remove("CommandType");
-					messagejo.remove("CommandValue");
-					messagejo.put("Content",vh.get("message"));
-					resultStr= org.json.XML.toString(messagejo,"xml");
-				} catch (JSONException e) {
+				logger.debug("vh is not null:"+vh.get("code"));
+				if("0".equals(String.valueOf(vh.get("code")))){
+					logger.debug("success");
+					try {
+						messagejo.remove("WX_VIP_ID");
+						messagejo.remove("AD_CLIENT_ID");
+						messagejo.remove("CommandType");
+						messagejo.remove("CommandValue");
+						messagejo.put("MsgType", "text");
+						messagejo.put("Content",vh.get("message"));
+						resultStr= org.json.XML.toString(messagejo,"xml");
+						SendWXMessage.sendWXMessage(request,response,resultStr);
+					} catch (JSONException e) {
+						logger.debug("error");
+						e.printStackTrace();
+						try{
+							PrintWriter pw=response.getWriter();
+							pw.print("success");
+							pw.flush();
+							pw.close();
+						}catch(Exception ex){
+							logger.debug("ClickDispose error->"+ex.getMessage());
+							e.printStackTrace();
+						}
+					}
+				}else{
+					logger.debug("code is not 0");
+					try{
+						messagejo.remove("WX_VIP_ID");
+						messagejo.remove("AD_CLIENT_ID");
+						messagejo.remove("CommandType");
+						messagejo.remove("CommandValue");
+						messagejo.put("MsgType", "text");
+						messagejo.put("Content",vh.get("message"));
+						resultStr= org.json.XML.toString(messagejo,"xml");
+					}catch(Exception e){
+						e.printStackTrace();
+					}
+					SendWXMessage.sendWXMessage(request,response,resultStr);
+				}				
+			}else{
+				try{
+					PrintWriter pw=response.getWriter();
+					pw.print("success");
+					pw.flush();
+					pw.close();
+				}catch(Exception e){
+					logger.debug("ClickDispose error->"+e.getMessage());
 					e.printStackTrace();
 				}
-			}
-			
-			try{
-				PrintWriter pw=response.getWriter();
-				pw.print(resultStr);
-				pw.flush();
-				pw.close();
-			}catch(Exception e){
-				logger.debug("ClickDispose error->"+e.getMessage());
-				e.printStackTrace();
 			}
 			return;
 		}
@@ -149,16 +184,7 @@ public class ClickDispose implements IMessageDispose {
 			e.printStackTrace();
 		}
 		
-		logger.debug("result->"+resultStr);
-		try{
-			PrintWriter pw=response.getWriter();
-			pw.print(resultStr);
-			pw.flush();
-			pw.close();
-		}catch(Exception e){
-			logger.debug("ClickDispose error->"+e.getMessage());
-			e.printStackTrace();
-		}
+		SendWXMessage.sendWXMessage(request,response,resultStr);
 	}
 
 }

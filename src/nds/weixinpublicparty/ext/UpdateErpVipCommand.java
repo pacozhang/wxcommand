@@ -50,9 +50,14 @@ public class UpdateErpVipCommand extends Command{
 		}
 		
 		int vipid=jo.optInt("vipid",-1);
-		int companyid=jo.optInt("ad_client_id",-1);
+		int companyid=jo.optInt("companyid",-1);
 		
-		if (companyid<=0 || vipid<=0) {
+		//导购门店到erp 参数begin--
+		int nowstoreid = jo.optInt("nowstore",-1);
+		int nowguideid = jo.optInt("nowguide",-1);
+		//导购门店到erp 参数end--
+		
+		if (companyid<=0 || vipid<=0||nowstoreid<=0||nowguideid<=0) {
 			logger.error("params error:companyid:"+companyid+",vipid:"+vipid);
 			vh.put("code", "-1");
 			vh.put("message", "完善资料异常，请重试");
@@ -116,7 +121,7 @@ public class UpdateErpVipCommand extends Command{
 			}
 		}
 		
-		if(!isErp) {
+		if(isErp) {
 			List al=null;
 			String sign=null;
 			JSONObject offparam=new JSONObject();
@@ -150,24 +155,34 @@ public class UpdateErpVipCommand extends Command{
 			}
 			
 			al=(List)al.get(0);
-			
+			String storecode=null;
+			String guideCode=null;
+
 			try{
 				//"BIRTHDAY":"19340202","NAME":"jackrain","PHONENUM":"18005695669","CONTACTADDRESS":"天津市辖区和平区中国上海徐汇","GENDER":"1"
-				offparam.put("args[openid]", String.valueOf(al.get(0)));
-				offparam.put("args[cardid]",String.valueOf(companyid));
-				offparam.put("args[wshno]","");
-				offparam.put("args[name]",jo.optString("RELNAME"));
-				offparam.put("args[gender]",jo.optString("SEX"));
-				offparam.put("args[birthday]",jo.optString("BIRTHDAY"));
-				offparam.put("args[contactaddress]",jo.optString("CONTACTADDRESS"));				
-				offparam.put("args[phonenum]",jo.optString("PHONENUM"));
-				offparam.put("args[viptype]", (String.valueOf(al.get(1))));
-				offparam.put("args[email]","");
-				offparam.put("args[idno]","");
+				offparam.put("openid", String.valueOf(al.get(0)));
+				offparam.put("cardid",String.valueOf(companyid));
+				//offparam.put("args[wshno]","");
+				offparam.put("name",jo.optString("RELNAME"));
+				offparam.put("gender",jo.optString("SEX"));
+				//offparam.put("args[birthday]",jo.optString("BIRTHDAY"));
+				//offparam.put("args[contactaddress]",jo.optString("CONTACTADDRESS"));				
+				offparam.put("phone",jo.optString("PHONENUM"));
+				//offparam.put("args[viptype]", (String.valueOf(al.get(1))));
+				//offparam.put("args[email]","");
+				//offparam.put("args[idno]","");
+				
+				storecode = String.valueOf(QueryEngine.getInstance().doQueryOne("select t.code from wx_store t where t.id=?", new Object[]{nowstoreid}));
+				guideCode = String.valueOf(QueryEngine.getInstance().doQueryOne("select t.code from wx_guide t where t.id=?", new Object[]{nowguideid}));
+			
+				offparam.put("storecode",storecode);//门店编号
+				offparam.put("guideCode",guideCode);//导购编号
+
 			}catch(Exception e){
 				
 			}
-
+			params.put("args[gender]", jo.optString("SEX"));
+			params.put("args[cardid]", String.valueOf(companyid));
 			params.put("args[params]", offparam.toString());
 			params.put("format","JSON");
 			params.put("client","");
@@ -209,9 +224,16 @@ public class UpdateErpVipCommand extends Command{
 			}
 		}
 		
-		String sql="update wx_vip v set v.relname=?,v.sex=?,v.phonenum=?,v.contactaddress=? where v.id=?";
+		/*
+		 String sql="update wx_vip v set v.relname=?,v.sex=?,v.phonenum=?,v.nowstore=?,v.nowguide=?,v.ischangecount=nvl(v.ischangecount,0)+1 where v.id=?";
+		 try{
+			QueryEngine.getInstance().executeUpdate(sql, new Object[]{jo.optString("RELNAME"),jo.optString("SEX"),jo.optString("PHONENUM"),nowstoreid,nowguideid,vipid});
+		
+		 */
+		
+		String sql="update wx_vip v set v.relname=?,v.sex=?,v.store=nvl(v.store,?),v.guide=nvl(v.guide,?),v.phonenum=?,v.nowstore=?,v.nowguide=?,v.ischangecount=decode(nvl(v.nowguide,?),?,nvl(v.ischangecount,0),nvl(v.ischangecount,0)+1) where v.id=?";
 		try{
-			QueryEngine.getInstance().executeUpdate(sql, new Object[]{jo.optString("RELNAME"),jo.optString("SEX"),jo.optString("PHONENUM"),jo.optString("CONTACTADDRESS"),vipid});
+			QueryEngine.getInstance().executeUpdate(sql, new Object[]{jo.optString("RELNAME"),jo.optString("SEX"),nowstoreid,nowguideid,jo.optString("PHONENUM"),nowstoreid,nowguideid,nowguideid,nowguideid,vipid});
 		}catch(Exception e){
 			logger.debug("update vip error:"+e.getLocalizedMessage());
 			e.printStackTrace();

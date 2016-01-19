@@ -60,13 +60,6 @@ public class GetAllMaterialCommand extends Command{
 			return vh;
 		}
 
-		String token=wc.getAccessToken();
-		if(nds.util.Validator.isNull(token)) {
-			vh.put("code", -1);
-			vh.put("message", "请重新授权");
-			return vh;
-		}
-
 		logger.debug("getAllMaterial");
 		
 		//素材类型
@@ -75,7 +68,7 @@ public class GetAllMaterialCommand extends Command{
 		WeBatchGetMaterial bgm=WeBatchGetMaterial.getInstance(wu.getAppId());
 		JSONObject tempjo=null;
 		try {		
-			 tempjo=bgm.getAllMaterials(user, type, token);
+			 tempjo=bgm.getAllMaterials(wc,user, type);
 			if(tempjo!=null) {
 				vh.put("code",tempjo.optInt("code",-1));
 				vh.put("message",tempjo.optString("message"));

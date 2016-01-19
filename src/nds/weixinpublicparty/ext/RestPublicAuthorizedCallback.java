@@ -19,6 +19,8 @@ import nds.publicpart.api.GetAuthorizerAccessToken;
 import nds.publicplatform.api.GetPublicInfo;
 import nds.query.QueryEngine;
 import nds.util.Tools;
+import nds.weixin.ext.WePublicparty;
+import nds.weixin.ext.WePublicpartyManger;
 import nds.weixin.ext.WeUtils;
 import nds.weixin.ext.WeUtilsManager;
 
@@ -52,7 +54,9 @@ public class RestPublicAuthorizedCallback  implements BinaryHandler{
 		}
 		
 		JSONObject jo=new JSONObject();
-		String wxappid=WebUtils.getProperty("currentpublicparty","wx73b758959e1ef0f2");
+		//String wxappid=WebUtils.getProperty("currentpublicparty","wx73b758959e1ef0f2");
+		WePublicparty wpp = WePublicpartyManger.getInstance().getWpc();
+		String wxappid=wpp.getAppid();
 		
 		GetAuthorizerAccessToken gaat=GetAuthorizerAccessToken.getInstance(wxappid);
 		JSONObject ppjo=gaat.getAuthAccessToken(request.getParameter("auth_code"));

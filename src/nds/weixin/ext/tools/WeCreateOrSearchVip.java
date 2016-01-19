@@ -19,10 +19,10 @@ public class WeCreateOrSearchVip {
 	private static Logger logger= LoggerManager.getInstance().getLogger(WeCreateOrSearchVip.class.getName());
 	private final static String searchVipid="select wvi.wx_vip_id from wx_vip_inqury wvi where wvi.WECHATNO=? and wvi.AD_CLIENT_ID=? and ROWNUM=1";
 	private final static String seachVip="select wvi.wx_vip_id,wvi.issubscribe,wvi.id from wx_vip_inqury wvi where wvi.WECHATNO=? and wvi.AD_CLIENT_ID=? and ROWNUM=1";
-	private final static String createVip="insert into wx_vip_inqury (ID,AD_CLIENT_ID,PHOTO,WECHATNO,DATEIN,NICKNAME,UNIONID,COUNTRY,PROVINCE,CITY,SEX,CONTACTADDRESS,ISSUBSCRIBE,DESCRIPTION,ownerid,creationdate,modifierid,modifieddate,isactive)"
-			  					+" select ?,?,?,?,?,?,?,?,?,?,?,?,?,?,c.ownerid,sysdate,c.ownerid,sysdate,'Y' from web_client c where c.ad_client_id=?";
-	private final static String createViptemp ="insert into wx_vip_inqury (id,ad_client_id,wechatno,issubscribe,description,ownerid,creationdate,modifierid,modifieddate,isactive)"
-								+" select ?,?,?,'N',?,c.ownerid,sysdate,c.ownerid,sysdate,'Y' from web_client c where c.ad_client_id=?";
+	private final static String createVip="insert into wx_vip_inqury (ID,AD_CLIENT_ID,recomment_vip,PHOTO,WECHATNO,DATEIN,NICKNAME,UNIONID,COUNTRY,PROVINCE,CITY,SEX,CONTACTADDRESS,ISSUBSCRIBE,DESCRIPTION,ownerid,creationdate,modifierid,modifieddate,isactive)"
+			  					+" select ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,c.ownerid,sysdate,c.ownerid,sysdate,'Y' from web_client c where c.ad_client_id=?";
+	private final static String createViptemp ="insert into wx_vip_inqury (id,ad_client_id,recomment_vip,wechatno,issubscribe,description,ownerid,creationdate,modifierid,modifieddate,isactive)"
+								+" select ?,?,?,?,'N',?,c.ownerid,sysdate,c.ownerid,sysdate,'Y' from web_client c where c.ad_client_id=?";
 	private final static String updatetvip="update wx_vip_inqury vi set vi.PHOTO=?,vi.NICKNAME=?,vi.UNIONID=?,vi.COUNTRY=?,vi.PROVINCE=?,vi.CITY=?,vi.SEX=?,vi.CONTACTADDRESS=?,vi.ISSUBSCRIBE=?,vi.updatedate=to_char(sysdate,'yyyyMMdd')"+
 			  " where vi.id=?";
 	
@@ -120,7 +120,7 @@ public class WeCreateOrSearchVip {
 					
 					logger.debug("viptempid-?"+viptempid);
 					paramsvip.add(viptempid);
-					QueryEngine.getInstance().executeUpdate(createVip, new Object[] {viptempid,wu.getAd_client_id(),userjo.optString("headimgurl",""),openid,userjo.optString("subscribe_time"),userjo.optString("nickname",""),userjo.optString("unionid"),userjo.optString("country"),userjo.optString("province"),userjo.optString("city"),userjo.optString("sex"),(address.length()<=0?"":address.toString()),(0==userjo.optInt("subscribe",0)?"N":"Y"),usertype,wu.getAd_client_id()}, con);
+					QueryEngine.getInstance().executeUpdate(createVip, new Object[] {viptempid,wu.getAd_client_id(),jo.optString("fromvipid"),userjo.optString("headimgurl",""),openid,userjo.optString("subscribe_time"),userjo.optString("nickname",""),userjo.optString("unionid"),userjo.optString("country"),userjo.optString("province"),userjo.optString("city"),userjo.optString("sex"),(address.length()<=0?"":address.toString()),(0==userjo.optInt("subscribe",0)?"N":"Y"),usertype,wu.getAd_client_id()}, con);
 					QueryEngine.getInstance().executeStoredProcedure("WX_VIP_INQURY_AC", paramsvip, false, con);
 					vipid=QueryEngine.getInstance().doQueryInt(searchVipid, new Object[] {openid,wu.getAd_client_id()}, con);
 					logger.debug("execute create vip=>");
@@ -135,7 +135,7 @@ public class WeCreateOrSearchVip {
 				
 				logger.debug("viptempid-?"+viptempid);
 				paramsvip.add(viptempid);
-				QueryEngine.getInstance().executeUpdate(createViptemp, new Object[] {viptempid,wu.getAd_client_id(),openid,"用户授权时新增用户：N",wu.getAd_client_id()}, con);
+				QueryEngine.getInstance().executeUpdate(createViptemp, new Object[] {viptempid,wu.getAd_client_id(),jo.optString("fromvipid"),openid,"用户授权时新增用户：N",wu.getAd_client_id()}, con);
 				QueryEngine.getInstance().executeStoredProcedure("WX_VIP_INQURY_AC", paramsvip, false, con);
 				vipid=QueryEngine.getInstance().doQueryInt(searchVipid, new Object[] {openid,wu.getAd_client_id()}, con);
 				logger.debug("execute create vip=>");

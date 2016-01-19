@@ -197,7 +197,7 @@ public class SignIntegralCommand extends Command {
 		}
 		signcount+=1;
 		
-		all=QueryEngine.getInstance().doQueryList("select ifs.erpurl,ifs.username,ifs.iserp,ifs.wxparam from WX_INTERFACESET ifs WHERE ifs.ad_client_id="+ad_client_id);
+		all=QueryEngine.getInstance().doQueryList("select ifs.erpurl,ifs.username,ifs.iserp,wc.wxparam from WX_INTERFACESET ifs join web_client wc on ifs.ad_client_id=wc.ad_client_id WHERE ifs.ad_client_id="+ad_client_id);
 		if(all!=null&&all.size()>0) {
 			logger.debug("WX_INTERFACESET size->"+all.size());
 			serverUrl=(String)((List)all.get(0)).get(0);
@@ -214,6 +214,7 @@ public class SignIntegralCommand extends Command {
 			HashMap<String, String> params =new HashMap<String, String>();
 			ts=String.valueOf(System.currentTimeMillis());
 			logger.debug("ts->"+ts);
+			params.put("args[cardid]",String.valueOf(ad_client_id));
 			params.put("args[cardno]",vipcardno);
 			params.put("args[docno]",ts);
 			params.put("args[description]","签到送积分");
@@ -283,7 +284,7 @@ public class SignIntegralCommand extends Command {
 	    WeUtils wu=WeUtilsManager.getByAdClientId(ad_client_id);
 	    String urlString = "";
 	    try {
-	    	urlString = URLEncoder.encode("http://"+wu.getDoMain()+"/html/nds/oto/webapp/cardscore/index.vml", "GBK");
+	    	urlString = URLEncoder.encode("http://"+wu.getDoMain()+"/html/nds/oto/webapp/pages/cardscore/index.htm", "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
@@ -307,9 +308,9 @@ public class SignIntegralCommand extends Command {
 					if(messagejo.has("FromUserName") == true && nds.util.Validator.isNotNull(urlString)){
 						if(signtype==1)//每天签到类型
 						{
-							vh.put("message", "签到成功\r\n当前"+count+"个积分\r\n您已连续签到"+signcount+"天\r\n本次签到获得"+signintegral+"个积分\r\n"+"点击<a href=\"https://open.weixin.qq.com/connect/oauth2/authorize?appid="+wu.getAppId()+"&redirect_uri="+urlString+"&response_type=code&scope=snsapi_base&state=123#wechat_redirect\">查看积分记录</a>");
+							vh.put("message", "签到成功\r\n当前"+count+"个积分\r\n您已连续签到"+signcount+"天\r\n本次签到获得"+signintegral+"个积分\r\n"+"点击<a href=\"https://open.weixin.qq.com/connect/oauth2/authorize?appid="+wu.getAppId()+"&redirect_uri="+urlString+"&response_type=code&scope=snsapi_base&state=123&component_appid="+wu.getPublicpartyappid()+"#wechat_redirect\">查看积分记录</a>");
 						}else{
-							vh.put("message", "签到成功\r\n当前"+count+"个积分\r\n您已连续签到"+signcount+"周\r\n本次签到获得"+signintegral+"个积分\r\n"+"点击<a href=\"https://open.weixin.qq.com/connect/oauth2/authorize?appid="+wu.getAppId()+"&redirect_uri="+urlString+"&response_type=code&scope=snsapi_base&state=123#wechat_redirect\">查看积分记录</a>");
+							vh.put("message", "签到成功\r\n当前"+count+"个积分\r\n您已连续签到"+signcount+"周\r\n本次签到获得"+signintegral+"个积分\r\n"+"点击<a href=\"https://open.weixin.qq.com/connect/oauth2/authorize?appid="+wu.getAppId()+"&redirect_uri="+urlString+"&response_type=code&scope=snsapi_base&state=123&component_appid="+wu.getPublicpartyappid()+"#wechat_redirect\">查看积分记录</a>");
 						}
 					}else{
 						if(signtype==1)//每天签到类型

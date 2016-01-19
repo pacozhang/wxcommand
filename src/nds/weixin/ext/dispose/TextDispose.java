@@ -24,6 +24,7 @@ import nds.weixin.ext.WePublicpartyManger;
 import nds.weixin.ext.WeUtils;
 import nds.weixin.ext.dispose.IMessageDispose;
 import nds.weixin.ext.tools.RestUtils;
+import nds.weixin.ext.tools.SendWXMessage;
 import nds.weixin.ext.tools.WXBizMsgCrypt;
 
 import org.dom4j.Document;
@@ -100,41 +101,7 @@ public class TextDispose implements IMessageDispose{
 			e1.printStackTrace();
 		}
 		
-		WePublicparty wpp=WePublicpartyManger.getInstance().getWpc();//.getByAppid(pappid);
-		String pappid=wpp.getAppid();
-		
-		if(wpp==null) {
-			logger.error("not find wepublicpartyby appid:"+pappid);
-			try {
-				PrintWriter pw=response.getWriter();
-				pw.print("success");
-				pw.flush();
-				pw.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			return;
-		}
-		logger.debug("result->"+resultStr);
-		try {
-			WXBizMsgCrypt pc = new WXBizMsgCrypt(wpp.getToken(), wpp.getNewencodingaeskey(), wpp.getAppid());
-			resultStr=pc.encryptMsg(resultStr, request.getParameter("timestamp"), request.getParameter("nonce"));
-			logger.debug("resultStr:"+resultStr+",timestamp:"+request.getParameter("timestamp")+",nonce:"+request.getParameter("nonce"));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		logger.debug("2result->"+resultStr);
-		try{
-			PrintWriter pw=response.getWriter();
-			pw.print(resultStr);
-			pw.flush();
-			pw.close();
-		}catch(Exception e){
-			logger.debug("text error->"+e.getMessage());
-			e.printStackTrace();
-		}
-		
+		SendWXMessage.sendWXMessage(request,response,resultStr);
 	}
 
 }

@@ -51,12 +51,6 @@ public class SendMessageCommand extends Command{
 			return vh;
 		}
 		//logger.debug("SendMessageCommand in4");
-		String token=wc.getAccessToken();
-		if(nds.util.Validator.isNull(token)) {
-			vh.put("code", -1);
-			vh.put("message", "请重新授权");
-			return vh;
-		}
 
 	
 		SendWeixinMessage bgm=SendWeixinMessage.getInstance(wu.getAppId());//调用与微信服务器交互类的方法

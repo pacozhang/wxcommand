@@ -49,12 +49,6 @@ public class CheckSendMessageCommand extends Command{
 			vh.put("message","请到菜单【微信】的【微信接口配置】中设置APPID与APPSECRET并点击【刷新APP】按钮");
 			return vh;
 		}
-		String token=wc.getAccessToken();
-		if(nds.util.Validator.isNull(token)) {
-			vh.put("code", -1);
-			vh.put("message", "请重新授权");
-			return vh;
-		}
 		
 		CheckSendMessage bgm=CheckSendMessage.getInstance(wu.getAppId());//调用与微信服务器交互类的方法
 		JSONObject tempjo=null;

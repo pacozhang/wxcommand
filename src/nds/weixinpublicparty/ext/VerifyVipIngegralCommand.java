@@ -56,7 +56,7 @@ public class VerifyVipIngegralCommand extends Command{
 		
 		
 		//查询接口相关信息 url,skey
-		List all=QueryEngine.getInstance().doQueryList("select ifs.erpurl,ifs.username,ifs.iserp,ifs.wxparam,nvl(ifs.ismesauth,'N') from WX_INTERFACESET ifs WHERE ifs.ad_client_id="+ad_client_id);
+		List all=QueryEngine.getInstance().doQueryList("select ifs.erpurl,ifs.username,ifs.iserp,wc.wxparam,nvl(ifs.ismesauth,'N') from WX_INTERFACESET ifs join web_client wc on ifs.ad_client_id=wc.ad_client_id WHERE ifs.ad_client_id="+ad_client_id);
 		
 		
 		if(all!=null&&all.size()>0) {
@@ -88,6 +88,8 @@ public class VerifyVipIngegralCommand extends Command{
 				return vh;
 			}
 			HashMap<String, String> params =new HashMap<String, String>();
+			params.put("args[cardid]",careid);
+			
 			params.put("args[vipno]",vipno);
 			params.put("args[integral]",String.valueOf(integral));
 			
@@ -118,11 +120,11 @@ public class VerifyVipIngegralCommand extends Command{
 				vh.put("message","ERP验证积分异常，请重试");
 				return vh;
 			}
-			vh.put("code", rjo.optString("errCode"));
+			vh.put("code", rjo.optInt("errCode"));
 			vh.put("message", rjo.optString("errMessage"));
 			vh.put("data", rjo.optString("data"));
 		}else {
-			vh.put("code","0");
+			vh.put("code",0);
 			vh.put("message","操作成功");
 		}
 		return vh;

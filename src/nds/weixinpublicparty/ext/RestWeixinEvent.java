@@ -5,6 +5,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -71,6 +73,23 @@ public class RestWeixinEvent
 	    inputStream.close(); 
 	    String result=baos.toString(charset);
 	    logger.debug("test message:"+result);
+	    String[] tmp = null;
+	    String tparams = null;
+
+	    this.logger.debug("get pathinfo->" + request.getPathInfo() + ",get servletpath->" + request.getServletPath());
+	    this.logger.debug("from online get param->" + request.getQueryString());
+	    this.logger.debug("from online post param->");
+	    for (Iterator iter = request.getParameterMap().entrySet().iterator(); iter.hasNext(); ) {
+	      Map.Entry element = (Map.Entry)iter.next();
+	      tmp = (String[])element.getValue();
+	      tparams = String.valueOf(element.getKey() + "::");
+	      if ((tmp != null) && (tmp.length > 0)) {
+	        for (int i = 0; i < tmp.length; i++) {
+	          tparams = tparams + tmp[i];
+	        }
+	      }
+	      this.logger.debug(tparams);
+	    }
 		
 		//String pappid=WebUtils.getProperty("currentpublicparty","wx73b758959e1ef0f2");
 		WePublicparty wpp=WePublicpartyManger.getInstance().getWpc();//.getByAppid(pappid);
@@ -89,18 +108,23 @@ public class RestWeixinEvent
 		
 		
 		result= XMLParse.extract(result);
+		logger.debug("e:"+result);
+		logger.debug("token:"+wpp.getToken()+",new:"+wpp.getNewencodingaeskey()+",old:"+wpp.getOldencodingaeskey()+",app:"+wpp.getAppid());
 	    WXBizMsgCrypt pc = new WXBizMsgCrypt(wpp.getToken(), wpp.getNewencodingaeskey(), wpp.getAppid());
 	    issuccess=pc.verifyMsg(msg_signature, timestamp, nonce, result);
+	    logger.debug("new issuccess:"+issuccess);
 	    
 	    if(!issuccess) {
 	    	pc = new WXBizMsgCrypt(wpp.getToken(), wpp.getOldencodingaeskey(), wpp.getAppid());
 	    	issuccess=pc.verifyMsg(msg_signature, timestamp, nonce, result);
 	    	if(issuccess) {wpp.setCurrentencodingaeskey(wpp.getOldencodingaeskey());}
 	    }
+	    logger.debug("old issuccess:"+issuccess);
 		
 	    if(nds.util.Validator.isNotNull(echostr)) {
 	    	issuccess=pc.verifyUrl(signature, timestamp, nonce, echostr);
 		}
+	    logger.debug("echostr issuccess:"+issuccess);
 	    if(!issuccess) {
 	    	logger.error("verify error");
 	    	return;

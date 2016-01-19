@@ -35,6 +35,14 @@ public class ScanDispose implements IMessageDispose {
 	public void dispose(HttpServletRequest request,HttpServletResponse response, WxPublicControl wpc, JSONObject jo) {
 		int vipid=0;
 		String code="";
+		String ticket=jo.optString("EventKey");
+		if(nds.util.Validator.isNotNull(ticket) && ticket.startsWith("vip")){
+			try{
+				jo.put("fromvipid", ticket.replace("vip", ""));
+			}catch(Exception e){
+				
+			}
+		}
 		
 		JSONObject vipjo=null;
 		WeUtils wu=wpc.getWxPublic();

@@ -62,5 +62,4 @@ public class UserAuthorization implements IAuthorization{
 		}
 		return vip;
 	}
-
 }
