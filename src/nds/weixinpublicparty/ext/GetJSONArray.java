@@ -106,9 +106,9 @@ public class GetJSONArray extends Command{
 	    
 		if( dataConfig.getOrderbyColumnId()!=-1){
 			Column orderColumn= manager.getColumn(dataConfig.getOrderbyColumnId());
-			if(orderColumn!=null && orderColumn.getTable().getId()== tableId)query.setOrderBy(new int[]{dataConfig.getOrderbyColumnId()}, dataConfig.isAscending());
+			if(orderColumn!=null && orderColumn.getTable().getId()== tableId)query.addOrderBy(new int[]{dataConfig.getOrderbyColumnId()}, dataConfig.isAscending());
 		}else if(!isorderby){
-	    	query.setOrderBy(new int[]{ table.getPrimaryKey().getId()}, false);
+	    	query.addOrderBy(new int[]{ table.getPrimaryKey().getId()}, false);
 	    }
 		
 		// µœ÷∑÷“≥
