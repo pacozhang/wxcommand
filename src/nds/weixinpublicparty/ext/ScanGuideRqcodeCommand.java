@@ -46,7 +46,7 @@ public class ScanGuideRqcodeCommand extends Command{
 		
 		
 		try{
-			QueryEngine.getInstance().executeUpdate("update wx_vip v set (v.store,v.guide,v.nowstore,v.nowguide)=(select nvl(g.wx_store_id,v.store), nvl(g.id,v.guide), nvl(g.wx_store_id,v.nowstore), nvl(g.id,v.guide) from wx_guide g where g.id=? and g.wx_store_id=nvl(v.store,g.wx_store_id)) where v.wechatno=? and v.ad_client_id=? and v.guide is null",new Object[]{guideid,messagejo.optString("ToUserName"),ad_client_id});
+			QueryEngine.getInstance().executeUpdate("update wx_vip v set (v.store,v.guide,v.nowstore,v.nowguide)=(select nvl(g.wx_store_id,v.store), nvl(g.id,v.guide), nvl(g.wx_store_id,v.nowstore), nvl(g.id,v.guide) from wx_guide g where g.id=?) where v.wechatno=? and v.ad_client_id=? and v.nowguide is null",new Object[]{guideid,messagejo.optString("ToUserName"),ad_client_id});
 			vh.put("code", "0");
 			vh.put("message", "update vip guide success");
 		}catch(Exception e){
