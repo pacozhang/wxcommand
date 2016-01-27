@@ -32,46 +32,53 @@ public class GetAddressCommand extends Command {
 		JSONObject cityjo=new JSONObject();
 		JSONObject areajo=new JSONObject();
 		String mkey=null;
-		Connection con=QueryEngine.getInstance().getConnection();
-		
-		provinceja=QueryEngine.getInstance().doQueryObjectArray("select p.id \"id\",p.name \"name\" from c_province p", new Object[] {},con);
-		JSONArray cityja=QueryEngine.getInstance().doQueryObjectArray("select c.id \"id\",c.name \"name\",c.c_province_id \"provinceid\" from c_city c", new Object[] {},con);
-		JSONArray areaja=QueryEngine.getInstance().doQueryObjectArray("select d.id \"id\",d.name \"name\",d.c_city_id \"cityid\" from c_area d", new Object[] {},con);
-		
-		if(cityja!=null&&cityja.length()>0) {
-			JSONObject mcityjo=null;
-			for(int i=0;i<cityja.length();i++) {
-				mcityjo=cityja.optJSONObject(i);
-				if(mcityjo!=null&&mcityjo!=JSONObject.NULL&&mcityjo.has("PROVINCEID")) {
-					mkey="PROVINCE"+mcityjo.optInt("PROVINCEID");
-					try {
-						if(!cityjo.has(mkey)) {
-							cityjo.put(mkey, new JSONArray());
+		try {
+			Connection con=QueryEngine.getInstance().getConnection();
+			
+			provinceja=QueryEngine.getInstance().doQueryObjectArray("select p.id \"id\",p.name \"name\" from c_province p", new Object[] {},con);
+			JSONArray cityja=QueryEngine.getInstance().doQueryObjectArray("select c.id \"id\",c.name \"name\",c.c_province_id \"provinceid\" from c_city c", new Object[] {},con);
+			JSONArray areaja=QueryEngine.getInstance().doQueryObjectArray("select d.id \"id\",d.name \"name\",d.c_city_id \"cityid\" from c_area d", new Object[] {},con);
+			
+			if(cityja!=null&&cityja.length()>0) {
+				JSONObject mcityjo=null;
+				for(int i=0;i<cityja.length();i++) {
+					mcityjo=cityja.optJSONObject(i);
+					if(mcityjo!=null&&mcityjo!=JSONObject.NULL&&mcityjo.has("PROVINCEID")) {
+						mkey="PROVINCE"+mcityjo.optInt("PROVINCEID");
+						try {
+							if(!cityjo.has(mkey)) {
+								cityjo.put(mkey, new JSONArray());
+							}
+							cityjo.optJSONArray(mkey).put( mcityjo);
+						} catch (JSONException e) {
+							e.printStackTrace();
 						}
-						cityjo.optJSONArray(mkey).put( mcityjo);
-					} catch (JSONException e) {
-						e.printStackTrace();
 					}
 				}
 			}
-		}
-		if(areaja!=null&&areaja.length()>0) {
-			JSONObject mareajo=null;
-			for(int i=0;i<areaja.length();i++) {
-				mareajo=areaja.optJSONObject(i);
-				if(mareajo!=null&&mareajo!=JSONObject.NULL&&mareajo.has("CITYID")) {
-					mkey="CITY"+mareajo.optInt("CITYID");
-					try {
-						if(!areajo.has(mkey)) {
-							areajo.put(mkey, new JSONArray());
+			if(areaja!=null&&areaja.length()>0) {
+				JSONObject mareajo=null;
+				for(int i=0;i<areaja.length();i++) {
+					mareajo=areaja.optJSONObject(i);
+					if(mareajo!=null&&mareajo!=JSONObject.NULL&&mareajo.has("CITYID")) {
+						mkey="CITY"+mareajo.optInt("CITYID");
+						try {
+							if(!areajo.has(mkey)) {
+								areajo.put(mkey, new JSONArray());
+							}
+							areajo.optJSONArray(mkey).put(mareajo);
+						} catch (JSONException e) {
+							e.printStackTrace();
 						}
-						areajo.optJSONArray(mkey).put(mareajo);
-					} catch (JSONException e) {
-						e.printStackTrace();
 					}
 				}
 			}
+			con.close();
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
 		}
+		
 		StringBuffer addresssb=new StringBuffer();
 		addresssb.append("var province=");
 		addresssb.append(provinceja.toString());
@@ -158,6 +165,7 @@ public class GetAddressCommand extends Command {
 		
 		 vh.put("code","0");
 	     vh.put("message","²Ù×÷³É¹¦");
+	     
 	     return vh;
 	}
 

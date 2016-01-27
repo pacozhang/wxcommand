@@ -49,30 +49,36 @@ public class ShareCodeCommand extends Command {
 		String vipsql = "select v.VIPCARDNO from wx_vip v where v.id=?";
 		JSONObject vipjson= QueryEngine.getInstance().doQueryObject(vipsql.toString(),new Object[]{wx_vip_id});
 		String vipcardno = vipjson.optString("VIPCARDNO");
-		
-		QueryEngine qe=null;
-		Connection con=null;
+		int bonuspoints=0;
 		try {
-			qe = QueryEngine.getInstance();
-			con=qe.getConnection();
+			QueryEngine qe=null;
+			Connection con=null;
+			try {
+				qe = QueryEngine.getInstance();
+				con=qe.getConnection();
+			} catch (Exception e) {
+				e.printStackTrace();
+				vh.put("code", "-1");
+				vh.put("message", "失败");
+				return vh;
+			}
+			
+			bonuspoints=(Integer) qe.doQueryInt(sql, con);
+			if(bonuspoints<0){
+				vh.put("code", "-1");
+				vh.put("message", "没有符合的数据");
+				return vh;
+			}
+			int addsharerecord=qe.executeUpdate(isql,new Object[] {wx_vip_id,targetid,fromid,objid,url,bonuspoints,ad_client_id},con);
+			if(addsharerecord<=0){
+				vh.put("code", "-1");
+				vh.put("message","数据已存在，无需插入");
+				return vh;
+			}
+			con.close();
 		} catch (Exception e) {
+			// TODO: handle exception
 			e.printStackTrace();
-			vh.put("code", "-1");
-			vh.put("message", "失败");
-			return vh;
-		}
-		
-		int bonuspoints=(Integer) qe.doQueryInt(sql, con);
-		if(bonuspoints<0){
-			vh.put("code", "-1");
-			vh.put("message", "没有符合的数据");
-			return vh;
-		}
-		int addsharerecord=qe.executeUpdate(isql,new Object[] {wx_vip_id,targetid,fromid,objid,url,bonuspoints,ad_client_id},con);
-		if(addsharerecord<=0){
-			vh.put("code", "-1");
-			vh.put("message","数据已存在，无需插入");
-			return vh;
 		}
 		
 		boolean isErp=false;
@@ -169,6 +175,7 @@ public class ShareCodeCommand extends Command {
 			vh.put("message", "线上操作失败");
 			return vh;
 		}
+		
 		return vh;
 	}
 }
