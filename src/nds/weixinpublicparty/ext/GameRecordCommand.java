@@ -203,8 +203,7 @@ public class GameRecordCommand extends Command {
 			}
 
 			List couponinfo = QueryEngine.getInstance()
-					.doQueryList("select c.USETYPE1,c.NUM from wx_coupon c where c.NUM = " + wx_cp_num
-							+ " and c.ad_client_id=" + ad_client_id + " and rownum<=1");
+					.doQueryList("select c.USETYPE1,c.NUM from wx_coupon c where c.NUM = ? and c.ad_client_id=" + ad_client_id + " and rownum<=1" ,new Object[]{wx_cp_num});
 
 			if (nds.util.Validator.isNull(wx_cp_num) || couponinfo.size() != 1) {
 				logger.debug("params error -->wx_cp_num not found");
