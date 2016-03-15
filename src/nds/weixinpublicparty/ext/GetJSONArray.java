@@ -2,6 +2,7 @@ package nds.weixinpublicparty.ext;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -133,8 +134,19 @@ public class GetJSONArray extends Command{
 		PairTable fixedColumns=null;
 		Expression fixedExpr=null;
 		try{
-			fixedColumns= PairTable.parse(fixedcol,null );
-	 		fixedExpr=Expression.parsePairTable(fixedColumns);
+			if(nds.util.Validator.isNotNull(fixedcol)){
+				Expression er=null;
+				StringTokenizer st=new StringTokenizer(fixedcol,"|");
+				while(st.hasMoreElements()){
+					fixedColumns=PairTable.parse(st.nextToken(),null);
+					
+					er=Expression.parsePairTable(fixedColumns);
+					if(fixedExpr==null){fixedExpr=er;}
+					else{fixedExpr=fixedExpr.combine(er, SQLCombination.SQL_OR, null);}
+				}
+		 		//fixedColumns= PairTable.parse(fixedcol,null );
+		 		//fixedExpr=Expression.parsePairTable(fixedColumns);
+			}
 		}catch(NumberFormatException  e){
 			logger.debug("params error->fixedcol format error");
 			vh.put("code", "-1");
