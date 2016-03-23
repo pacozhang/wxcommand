@@ -2,7 +2,6 @@ package nds.weixinpublicparty.ext;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.StringTokenizer;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -131,7 +130,29 @@ public class GetJSONArray extends Command{
 			else expr=new Expression(new ColumnLink(new int[]{table.getColumn("AD_CLIENT_ID").getId()}), "="+adClientId, null);
 		}
 		
-		PairTable fixedColumns=null;
+		if (nds.util.Validator.isNotNull(fixedcol)) {
+			String[] st = fixedcol.split("&&");
+			for (String splitFixedcol : st) {
+				PairTable fixedColumns = null;
+				Expression fixedExpr = null;
+				if (!splitFixedcol.contains("|")) {
+					fixedColumns = PairTable.parse(splitFixedcol, null);
+					fixedExpr = Expression.parsePairTable(fixedColumns);
+				} else {
+					fixedColumns = PairTable.allParse(splitFixedcol, "|", null);
+					fixedExpr = Expression.allParsePairTable(fixedColumns, Expression.SQL_OR);
+				}
+				if (fixedExpr != null) {
+					if (expr == null) {
+						expr = fixedExpr;
+					} else {
+						expr = expr.combine(fixedExpr, SQLCombination.SQL_AND, null);
+					}
+				}
+			}
+		}
+		
+/*		PairTable fixedColumns=null;
 		Expression fixedExpr=null;
 		try{
 			if(nds.util.Validator.isNotNull(fixedcol)){
@@ -157,7 +178,7 @@ public class GetJSONArray extends Command{
 		if(fixedExpr!=null){
 			if(expr==null){expr=fixedExpr;}
 			else{expr=expr.combine(fixedExpr, SQLCombination.SQL_AND, null);}
-		}
+		}*/
 
 		query.addParam(expr);
 		logger.debug("expr->"+(expr==null?"is null":expr.toString()));
