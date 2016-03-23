@@ -55,9 +55,7 @@ public class Scratch {
 			String wxVipId) throws NumberFormatException, JSONException,
 			QueryException {
 		
-/*
- * 
- * 戈美琪中奖后可继续抽奖
+
  
 		// 查询vip是否中奖
 		String recordCountStr = "select count(*) from WX_SCRATCHTICKET_NOTE t where t.ad_client_id = ? and t.wx_scratchticket_id = ? and t.wx_vip_id = ? and t.wx_scratchreward_id is not null";
@@ -69,7 +67,7 @@ public class Scratch {
 		if (recordCount >= 1) {
 			return "{\"code\":\"-1\",\"message\":\"您本次活动已经抽中奖品，则不可在刮了！\"}";
 		}
-	*/	
+		
 		// 查询每人最多允许抽奖次数和中奖率
 		String queryMAXTIMES = "select t.MAXTIMES,t.REWARDRATE from WX_SCRATCHTICKET t where t.ad_client_id = ? and t.id = ? ";
 		JSONObject bigwheelJson = QueryEngine.getInstance().doQueryObject(
