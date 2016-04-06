@@ -50,9 +50,11 @@ public class ShareCodeCommand extends Command {
 		JSONObject vipjson= QueryEngine.getInstance().doQueryObject(vipsql.toString(),new Object[]{wx_vip_id});
 		String vipcardno = vipjson.optString("VIPCARDNO");
 		int bonuspoints=0;
+		Connection con=null;
+		
 		try {
 			QueryEngine qe=null;
-			Connection con=null;
+			
 			try {
 				qe = QueryEngine.getInstance();
 				con=qe.getConnection();
@@ -75,10 +77,17 @@ public class ShareCodeCommand extends Command {
 				vh.put("message","数据已存在，无需插入");
 				return vh;
 			}
-			con.close();
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
+		}finally{
+			if(con!=null){
+				try{
+					con.close();
+				}catch(Exception e){
+					
+				}
+			}
 		}
 		
 		boolean isErp=false;
@@ -119,13 +128,9 @@ public class ShareCodeCommand extends Command {
 			try{
 				vh=RestUtils.sendRequest(serverUrl,params,"POST");
 				logger.debug("vh->"+vh.get("message"));
-			} catch (Throwable tx) {
-				logger.debug("ERP网络通信障碍!");
-				try {
-					throw new Exception("ERP网络通信障碍!->"+tx.getMessage());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+			} catch (Throwable e) {
+				logger.debug("ERP网络通信障碍!"+e.getLocalizedMessage());
+				e.printStackTrace();
 			}
 			String result=(String) vh.get("message");
 			logger.debug("是否成功调用"+result);

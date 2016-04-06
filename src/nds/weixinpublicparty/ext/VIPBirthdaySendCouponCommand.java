@@ -48,10 +48,11 @@ public class VIPBirthdaySendCouponCommand extends Command {
 			   +" and    to_number(to_char(to_date(v.birthday,'yyyymmdd'),'mm')) = to_number(to_char(sysdate,'mm'))";
 		
 		String updatesql="update wx_birthdaycoupon bc set bc.whethernot='Y' where bc.id=?";
+		Connection con=null;
 		
 		try {
 			QueryEngine qe=null;
-			Connection con=null;
+			
 			try {
 				qe = QueryEngine.getInstance();
 				con=qe.getConnection();
@@ -208,13 +209,8 @@ public class VIPBirthdaySendCouponCommand extends Command {
 							Log.debug("welcome!!!");
 							vh=RestUtils.sendRequest(erpurl,params,"POST");
 							Log.debug("vh->"+vh);
-						   } catch (Throwable tx) {
-							   Log.debug("ERPÍøÂçÍ¨ÐÅÕÏ°­!");
-							try {
-								throw new Exception("ERPÍøÂçÍ¨ÐÅÕÏ°­!->"+tx.getMessage());
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
+					    } catch (Throwable e) {
+							   Log.debug("ERPÍøÂçÍ¨ÐÅÕÏ°­!"+e.getLocalizedMessage());
 						}
 						result=(String) vh.get("message");
 						logger.debug("birthday coupon offline code result->"+result);
@@ -279,10 +275,17 @@ public class VIPBirthdaySendCouponCommand extends Command {
 				vh.put("code", "-1");
 				vh.put("message", "·¢È¯Ê§°Ü");
 			}
-			con.close();
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
+		}finally{
+			if(con!=null){
+				try{
+					con.close();
+				}catch(Exception e){
+					
+				}
+			}
 		}
 		
 		return vh;

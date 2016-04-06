@@ -32,8 +32,9 @@ public class GetAddressCommand extends Command {
 		JSONObject cityjo=new JSONObject();
 		JSONObject areajo=new JSONObject();
 		String mkey=null;
+		Connection con=null;
 		try {
-			Connection con=QueryEngine.getInstance().getConnection();
+			con=QueryEngine.getInstance().getConnection();
 			
 			provinceja=QueryEngine.getInstance().doQueryObjectArray("select p.id \"id\",p.name \"name\" from c_province p", new Object[] {},con);
 			JSONArray cityja=QueryEngine.getInstance().doQueryObjectArray("select c.id \"id\",c.name \"name\",c.c_province_id \"provinceid\" from c_city c", new Object[] {},con);
@@ -73,10 +74,17 @@ public class GetAddressCommand extends Command {
 					}
 				}
 			}
-			con.close();
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
+		}finally{
+			if(con!=null){
+				try{
+					con.close();
+				}catch(Exception e){
+					
+				}
+			}
 		}
 		
 		StringBuffer addresssb=new StringBuffer();

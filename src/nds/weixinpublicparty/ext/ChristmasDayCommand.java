@@ -45,10 +45,11 @@ public class ChristmasDayCommand extends Command {
 			   +" and v.id ";
 		//更新是否发放
 		String updatesql="update wx_festivalcoupon fc set fc.whethernot='Y' where fc.id=?";
+		Connection con=null;
 		
 		try {
 			QueryEngine qe=null;
-			Connection con=null;
+			
 			try {
 				qe = QueryEngine.getInstance();
 				con=qe.getConnection();
@@ -220,13 +221,9 @@ public class ChristmasDayCommand extends Command {
 							logger.error("welcome!!!");
 							vh=RestUtils.sendRequest(erpurl,params,"POST");
 							logger.error("vh->"+vh);
-						   } catch (Throwable tx) {
-							   logger.error("ERP网络通信障碍!");
-							try {
-								throw new Exception("ERP网络通信障碍!->"+tx.getMessage());
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
+						   } catch (Throwable e) {
+							   logger.error("ERP网络通信障碍!"+e.getLocalizedMessage());
+							   e.printStackTrace();
 						}
 						result=(String) vh.get("message");
 						logger.error("coupon offline code result->"+result);
@@ -290,10 +287,17 @@ public class ChristmasDayCommand extends Command {
 				vh.put("code", "-1");
 				vh.put("message", "发券失败");
 			}
-			con.close();
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
+		}finally{
+			if(con!=null){
+				try{
+					con.close();
+				}catch(Exception e){
+					
+				}
+			}
 		}
 		
 		return vh;
