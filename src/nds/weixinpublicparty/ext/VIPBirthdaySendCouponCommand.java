@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 
-import org.jfree.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -67,14 +66,14 @@ public class VIPBirthdaySendCouponCommand extends Command {
 			try {
 				allcoupons = qe.doQueryList(sql,con);
 			} catch (QueryException e) {
-				Log.debug("search wx_autosendcoupon error->"+e.getLocalizedMessage());
+				logger.debug("search wx_autosendcoupon error->"+e.getLocalizedMessage());
 				e.printStackTrace();
 				try {
 					if(con!=null) {
 						con.close();
 					}
 				}catch(Exception e1) {
-					Log.debug("search wx_autosendcoupon cloas connectiion error->"+e1.getLocalizedMessage());
+					logger.debug("search wx_autosendcoupon cloas connectiion error->"+e1.getLocalizedMessage());
 					e1.printStackTrace();
 				}
 			}
@@ -109,6 +108,7 @@ public class VIPBirthdaySendCouponCommand extends Command {
 			String result=null;
 			JSONObject jo=null;
 			String ticketno=null;
+			ValueHolder vhr;
 			JSONObject consumejo =null;
 			int vipid=0;
 			int bcid=0;
@@ -123,7 +123,7 @@ public class VIPBirthdaySendCouponCommand extends Command {
 				bcid=Tools.getInt(couponone.get(1), -1);
 				
 				if(ad_client_id<=0) {
-					Log.debug("ad_client_id error->"+ad_client_id);
+					logger.debug("ad_client_id error->"+ad_client_id);
 					continue;
 				}
 				try {
@@ -143,7 +143,7 @@ public class VIPBirthdaySendCouponCommand extends Command {
 							}
 							compaoninf.put(ad_client_id, cone);
 						}catch(Exception e) {
-							Log.debug("search company error->"+e.getLocalizedMessage());
+							logger.debug("search company error->"+e.getLocalizedMessage());
 							e.printStackTrace();
 							continue;
 						}
@@ -156,7 +156,7 @@ public class VIPBirthdaySendCouponCommand extends Command {
 							con.close();
 						}
 					}catch(Exception e1) {
-						Log.debug("search vip cloas connectiion error->"+e1.getLocalizedMessage());
+						logger.debug("search vip cloas connectiion error->"+e1.getLocalizedMessage());
 						e1.printStackTrace();
 					}
 					continue;
@@ -184,7 +184,7 @@ public class VIPBirthdaySendCouponCommand extends Command {
 						vipcardno=String.valueOf(vipone.get(2));
 						params =new HashMap<String, String>();
 						String ts=String.valueOf(System.currentTimeMillis());
-						Log.debug("ts->"+ts);
+						logger.debug("ts->"+ts);
 						params.put("args[cardid]",String.valueOf(ad_client_id));
 						params.put("args[openid]",openid);
 						params.put("args[vipno]",vipcardno);
@@ -204,15 +204,16 @@ public class VIPBirthdaySendCouponCommand extends Command {
 						}
 						params.put("method","sendcoupon");
 						
-						Log.debug("params->"+params);
+						logger.debug("params->"+params);
 						try{
-							Log.debug("welcome!!!");
-							vh=RestUtils.sendRequest(erpurl,params,"POST");
-							Log.debug("vh->"+vh);
+							logger.debug("welcome!!!");
+							vhr=RestUtils.sendRequest(erpurl,params,"POST");
+							logger.debug("vh->"+vhr);
 					    } catch (Throwable e) {
-							   Log.debug("ERPÍøÂçÍ¨ÐÅÕÏ°­!"+e.getLocalizedMessage());
+					    	logger.debug("ERPÍøÂçÍ¨ÐÅÕÏ°­!"+e.getLocalizedMessage());
+					    	continue;
 						}
-						result=(String) vh.get("message");
+						result=(String) vhr.get("message");
 						logger.debug("birthday coupon offline code result->"+result);
 						try {
 							jo= new JSONObject(result);
