@@ -6,7 +6,7 @@ import nds.control.ejb.Command;
 import nds.control.event.DefaultWebEvent;
 import nds.control.util.ValueHolder;
 import nds.util.NDSException;
-import nds.weixinpublicparty.ext.common.CommonSendCoupon;
+import nds.weixin.ext.requesterp.CommonSendCoupon;
 
 public class ChristmasDayCommand extends Command {
 	@Override

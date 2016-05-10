@@ -24,6 +24,7 @@ public class AutomaticRefundsvr extends SvrProcess{
 			JSONObject vjo=new JSONObject();
             JSONObject auditjo=new JSONObject();
             JSONArray orderids = QueryEngine.getInstance().doQueryJSONArray("select ro.id from wx_refundorders ro join wx_order o on ro.wx_order_id=o.id join wx_gmall wg on o.wx_gmall_id=wg.id where wg.isautorefund='Y' and o.tot_amt>0 and ro.refund_status=? ",new Object[]{2});
+           // JSONArray orderids = QueryEngine.getInstance().doQueryJSONArray("select ro.id from wx_refundorders ro join wx_order o on ro.wx_order_id=o.id join wx_gmall wg on o.wx_gmall_id=wg.id where wg.isautorefund='Y' and o.tot_amt>0 and ro.refund_status<>? ",new Object[]{3});
             log.debug("AutomaticRefundsvr  orderids 本次处理退款单条数-->"+orderids.length()+"退款单ids-->"+orderids.toString());
             if (orderids.length()>0) {
 				try {
@@ -33,6 +34,7 @@ public class AutomaticRefundsvr extends SvrProcess{
 
 				}
 				event.put("jsonObject", vjo);
+				event.put("nds.control.ejb.UserTransaction" , "N");
 				event.setParameter("command", "nds.weixin.wxt.foreign.WeixinRefundOrderCommand");
 				controller.handleEvent(event);
 			}

@@ -5,7 +5,7 @@ import nds.control.util.ValueHolder;
 import nds.control.web.ClientControllerWebImpl;
 import nds.control.web.WebUtils;
 import nds.process.SvrProcess;
-import nds.weixinpublicparty.ext.common.CommonSendCoupon;
+import nds.weixin.ext.requesterp.CommonSendCoupon;
 
 public class SinglesDayCouponsvr extends SvrProcess {
 
